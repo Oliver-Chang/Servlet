@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="79bdc496-3e6e-43ce-8d06-cbc4e4837c76" name="Chengdu" url="http://118.24.173.233">
+        <fileTransfer host="118.24.173.233" port="22" rootFolder="/home/oliver" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
