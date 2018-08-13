@@ -2,17 +2,12 @@ package com.oliverch.common.dao;
 
 
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.PreparedStatement;
-import com.mysql.jdbc.Statement;
 import org.apache.commons.beanutils.BeanUtils;
 
 
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,11 +22,6 @@ import java.util.List;
 
 public class BaseDao {
 
-    // 初始化参数
-    static private Connection conn;
-    static private PreparedStatement pstmt;
-    static private ResultSet rs;
-
 
     /**
      * 查询的通用方法
@@ -42,6 +32,9 @@ public class BaseDao {
      */
 
     static public <T> List<T> query(String sql, List<Object> params, Class<T> clazz) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
         List<T> list = null;
         try {
             // 返回的集合
@@ -52,7 +45,7 @@ public class BaseDao {
             // 1. 获取连接
             conn = JDBCUtil.getConnection();
             // 2. 创建stmt对象
-            pstmt = (PreparedStatement) conn.prepareStatement(sql);
+            pstmt = conn.prepareStatement(sql);
             // 3. 获取占位符参数的个数， 并设置每个参数的值
             Integer count = pstmt.getParameterMetaData().getParameterCount();
             if (params != null && params.size() > 0) {
@@ -79,9 +72,6 @@ public class BaseDao {
                     String columnName = rsmd.getColumnName(i + 1);
                     // 获取每一列的列名称, 对应的值
                     Object value = rs.getObject(columnName);
-//                    BeanUtils.setProperty(t, columnName, value);
-
-
                     // 封装： 设置到t对象的属性中  【BeanUtils组件】
                     BeanUtils.copyProperty(t, columnName, value);
                 }
@@ -105,6 +95,9 @@ public class BaseDao {
      * @param params sql语句中占位符对应的值(如果没有占位符，传入null)
      */
     static public Boolean update(String sql, List<Object> params, int[]... priKey) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
         Boolean ret = null;
         try {
             // 获取连接
@@ -129,7 +122,7 @@ public class BaseDao {
                 ret = true;
             }
             if (priKey != null) {
-                ResultSet rs = pstmt.getGeneratedKeys();
+                rs = pstmt.getGeneratedKeys();
                 while (rs.next()) {
                     priKey[0][0] = rs.getInt(1);
                 }
@@ -144,10 +137,13 @@ public class BaseDao {
     }
 
     static public Integer recordsCount(String sql, List<Object>params) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
         Integer recordsCount = 0;
-        conn = JDBCUtil.getConnection();
         // 2. 创建stmt对象
         try {
+            conn = JDBCUtil.getConnection();
             pstmt = (PreparedStatement) conn.prepareStatement(sql);
             // 3. 获取占位符参数的个数， 并设置每个参数的值
             Integer count = pstmt.getParameterMetaData().getParameterCount();

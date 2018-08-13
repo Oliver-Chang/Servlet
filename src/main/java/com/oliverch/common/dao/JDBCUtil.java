@@ -1,16 +1,14 @@
 package com.oliverch.common.dao;
 
 
-import com.mysql.jdbc.Connection;
-import com.mysql.jdbc.Statement;
 import com.oliverch.staff.Staff;
 import com.oliverch.utils.StringUtils;
+import org.mariadb.jdbc.MariaDbPoolDataSource;
+
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -23,10 +21,11 @@ public class JDBCUtil {
     // 数据库用户名和密码
     private static String userName = null;
     private static String passWord = null;
+    private static Integer maxPoolSize = null;
+    private static Integer port = null;
+    private static String dataBaseName = null;
 
-//    private static Connection conn = null;
-//    private static Statement stmt = null;
-//    private static ResultSet rs = null;
+    private static MariaDbPoolDataSource poolDataSource = null;
 
     /**
      * 初始化驱动程序
@@ -52,9 +51,18 @@ public class JDBCUtil {
             driverClass = prop.getProperty("driverClass");
             userName = prop.getProperty("userName");
             passWord = prop.getProperty("passWord");
+            maxPoolSize = Integer.valueOf(prop.getProperty("maxPoolSize"));
+
 
             //注册驱动程序
             Class.forName(driverClass);
+            poolDataSource = new MariaDbPoolDataSource();
+            poolDataSource.setUrl(url);
+            poolDataSource.setUser(userName);
+            poolDataSource.setPassword(passWord);
+            poolDataSource.setMaxPoolSize(maxPoolSize);
+            poolDataSource.initialize();
+
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("驱程程序注册出错");
@@ -67,8 +75,15 @@ public class JDBCUtil {
      */
     public static Connection getConnection() {
         Connection conn = null;
+//        try {
+//
+//            conn = DriverManager.getConnection(url, userName, passWord);
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            throw new RuntimeException(e);
+//        }
         try {
-            conn = (Connection) DriverManager.getConnection(url, userName, passWord);
+            conn = poolDataSource.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

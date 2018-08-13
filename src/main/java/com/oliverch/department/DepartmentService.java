@@ -26,8 +26,10 @@ public class DepartmentService {
     }
 
     public Result getAll() {
-
-        return Result.success(this.departmentDAO.getALL());
+        Result success = Result.success(this.departmentDAO.getALL());
+        System.out.println("department");
+        System.out.println(success);
+        return success;
     }
 
     public Result getById(Integer id) {

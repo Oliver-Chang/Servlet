@@ -27,8 +27,10 @@ public class PostService {
     }
 
     public Result getAll() {
-
-        return Result.success(this.postDao.getALL());
+        Result success = Result.success(this.postDao.getALL());
+        System.out.println("Post");
+        System.out.println(success);
+        return success;
     }
 
     public Result getById(Integer id) {
